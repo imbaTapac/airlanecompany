@@ -7,3 +7,4 @@ Create console application “Airline”:
 
 Added
 1. Find aircraft by name.
+2. JUnit tests.

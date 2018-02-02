@@ -13,9 +13,8 @@ import java.util.*;
  */
 public class AirlineCompany implements Airplanes, CargoPlanes {
 
-    public List<Airplane> ListOfAirline (List<Airplane >airplaneList){
-        List<Airplane> airplanes = airplaneList;
-        for (Airplane b1: airplanes){
+    public void ListOfAirline (List<Airplane >airplaneList){
+        for (Airplane b1: airplaneList){
             System.out.println("\n\n--------------"+b1.getName()+"--------------");
             System.out.println("------------Speed-----------\n\t\t\t"+b1.getSpeed()+"KM/H");
             System.out.println("------------Power----------\n\t\t\t"+b1.getPower()+"HP");
@@ -23,14 +22,12 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
             System.out.println("------------Fuel Consumption--------\n\t\t\t"+b1.getFuel_consumption()+"l. per hour");
             System.out.println("------------Range of flight---------\n\t\t\t"+b1.getRange_of_flight()+"KM");
         }
-        return airplanes;
     }
 
     public void PowerAndCapacity(List<CargoPlane>cargoPlaneList){
         int sumcapacity =0;
         int sumpower = 0;
-        List<CargoPlane> airplanes = cargoPlaneList;
-        for (CargoPlane b1: airplanes){
+        for (CargoPlane b1: cargoPlaneList){
             sumcapacity+=b1.getCapacity();
             sumpower+=b1.getPower();
         }
@@ -48,13 +45,9 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
         return airplanes;
     }
 
-    public List<Airplane> SortByFuelConsumption(List<Airplane >airplaneList) throws IOException {
+    public List<Airplane> SortByFuelConsumption(List<Airplane >airplaneList,int consumptionMin,int consumptionMax) {
         List<Airplane> airplanes = new ArrayList<Airplane>();
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter min fuel consumption");
-        int consumptionMin=sc.nextInt();
-        System.out.println("Enter max fuel consumption");
-        int consumptionMax=sc.nextInt();
         for(Airplane a1 :airplaneList){
             if(a1.getFuel_consumption()>=consumptionMin && a1.getFuel_consumption()<=consumptionMax){
             airplanes.add(a1);
@@ -62,22 +55,18 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
 
         }
         if (airplanes.size()==0){
-        System.out.println("There is not Aircraft with this range consumption");
-        System.in.read();
+        System.out.println("There is not Aircraft(s) with this range consumption");
         }
         return airplanes;
     }
 
-    public void FindAircraftByName(List<Airplane> airplaneList) throws IOException {
-        String name_aircraft;
+    public Airplane FindAircraftByName(List<Airplane> airplaneList, String name_aircraft) {
         boolean aircraft_was_found = false;
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter the name of aircraft which you like to search");
-        if(sc.hasNextLine()){
-            name_aircraft=sc.nextLine();
+        Airplane founded_aircaft = new Airplane();
             for (Airplane b1: airplaneList){
                 if(name_aircraft.equals(b1.getName())){
                     aircraft_was_found=true;
+                    founded_aircaft = b1;
                     System.out.println("\n\n--------------"+b1.getName()+"--------------");
                     System.out.println("------------Speed-----------\n\t\t\t"+b1.getSpeed()+"KM/H");
                     System.out.println("------------Power----------\n\t\t\t"+b1.getPower()+"HP");
@@ -85,12 +74,9 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
                     System.out.println("------------Fuel Consumption--------\n\t\t\t"+b1.getFuel_consumption()+"l. per hour");
                     System.out.println("------------Range of flight---------\n\t\t\t"+b1.getRange_of_flight()+"KM");
                 }
-
             }
             if(aircraft_was_found==false) System.out.println("There is not one plane that you enter to find.");
-            System.in.read();
-        }
-
+        return founded_aircaft;
     }
 
     public double Throughput_Airport() throws IOException {
@@ -111,15 +97,15 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
             }
              System.out.println("Enter the coefficient of daily unevenness of aircraft movement.");
             if (sc.hasNextDouble()) {
-            ks = sc.nextDouble();
+                ks = sc.nextDouble();
             }
             System.out.println("Enter the coefficient of hourly non-uniformity of aircraft movement.");
             if (sc.hasNextDouble()) {
-            kg = sc.nextDouble();
+                kg = sc.nextDouble();
             }
             System.out.println("Enter the number of hours of operation of the airport per day.");
             if (sc.hasNextDouble()) {
-            t_per_day = sc.nextDouble();
+                t_per_day = sc.nextDouble();
             }
             if (avgcapacity<=0 || airplane<=0 || kg<=0 || ks<=0 ||t_per_day<=0){
                 System.out.println("You entered an incorrect value, please repeat");
@@ -135,6 +121,7 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
     public void menu(List<Airplane> airplanes, List<CargoPlane>cargoplanes) throws IOException {
         Scanner sc = new Scanner(System.in);
         int choice = 0;
+        String name_aircraft;
         while (choice != 7) {
             System.out.println("\n\nWelcome to our company 'Airline' ");
             System.out.println("This is menu of our company");
@@ -156,7 +143,11 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
                     ListOfAirline(airplanes);
                     break;
                 case 2:
-                    FindAircraftByName(airplanes);
+                    System.out.println("Please enter the name of aircraft which you like to search");
+                    if(sc.hasNext()){
+                        name_aircraft=sc.next();
+                    FindAircraftByName(airplanes,name_aircraft);
+                    }
                     break;
                 case 3:
                     PowerAndCapacity(cargoplanes);
@@ -165,7 +156,24 @@ public class AirlineCompany implements Airplanes, CargoPlanes {
                     ListOfAirline(SortByFlyingRange(airplanes));
                     break;
                 case 5:
-                    ListOfAirline(SortByFuelConsumption(airplanes));
+                    int consumptionMin;
+                    int consumptionMax;
+                    System.out.println("Enter min fuel consumption");
+                    if (sc.hasNextInt()) {
+                        consumptionMin=sc.nextInt();
+                     } else {
+                        System.out.println("Invalid entering!");
+                        break;
+                     }
+                    System.out.println("Enter max fuel consumption");
+                    if (sc.hasNextInt()) {
+                        consumptionMax=sc.nextInt();
+                    }
+                    else {
+                        System.out.println("Invalid entering!");
+                        break;
+                    }
+                    ListOfAirline(SortByFuelConsumption(airplanes,consumptionMin,consumptionMax));
                     break;
                 case 6: Throughput_Airport();
                     break;
